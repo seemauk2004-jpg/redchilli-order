@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Red Chilli · Order Online</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Order fried chicken, burgers, pizza and more from Red Chilli in Thiruthuraipoondi, Velankanni and Karaikal. Pickup or delivery.">
+<meta name="theme-color" content="#C8102E">
+<script src="config.js"></script>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=Kaushan+Script&display=swap">
+<style>
+/* Layout: phone = one column with a cart bar pinned to the bottom; desktop = menu column + sticky cart panel.
+   Identity comes from the shop's printed menu: chilli red, black, and gold brush-stroke category banners. */
+:root{
+  --red:#C8102E; --red-dk:#9E0B23; --ink:#1A1312; --gold:#D4A73C; --gold-lt:#F3E2B3;
+  --paper:#FFFFFF; --wash:#F5F2F1; --line:#E7E1DF; --muted:#6F6461; --ok:#1E7B47; --veg:#1E7B47; --nv:#B3261E;
+  --display:"Barlow Condensed","Roboto Condensed","Arial Narrow",sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --script:"Kaushan Script","Brush Script MT",cursive;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--wash);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+[hidden]{display:none!important}
+.num{font-variant-numeric:tabular-nums}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+
+/* header */
+.top{background:var(--red);color:#fff;position:sticky;top:0;z-index:20;padding-top:env(safe-area-inset-top)}
+.top .wrap{display:flex;align-items:center;gap:12px;min-height:60px}
+.logo{font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:.01em;line-height:.9;text-transform:uppercase}
+.logo small{display:block;font-size:11.5px;letter-spacing:.24em;font-weight:600;opacity:.9}
+.top .sp{flex:1}
+.top .lnk{color:#fff;font-weight:600;font-size:14.5px;padding:8px 10px;border-radius:8px}
+.top .lnk:hover{background:rgba(255,255,255,.12)}
+
+/* store picker */
+.hero{background:var(--ink);color:#fff;overflow:hidden;position:relative}
+.hero .wrap{padding-top:34px;padding-bottom:30px;position:relative}
+.hero h1{font-family:var(--display);font-weight:800;font-size:clamp(40px,8vw,72px);line-height:.92;margin:0;text-transform:uppercase;max-width:12ch}
+.hero p{color:#E9DEDC;max-width:46ch;margin:12px 0 0}
+.hero .stroke{position:absolute;right:-40px;top:-30px;width:260px;height:260px;border-radius:50%;background:var(--red);opacity:.9}
+.hero .stroke2{position:absolute;right:120px;bottom:-70px;width:150px;height:150px;border-radius:50%;background:var(--gold);opacity:.85}
+.stores{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;padding:20px 0 40px}
+.store{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:150px}
+.store:hover{border-color:var(--red)}
+.store b{font-family:var(--display);font-size:26px;line-height:1;text-transform:uppercase}
+.store .ad{color:var(--muted);font-size:14px}
+.badge{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13px;padding:3px 10px;border-radius:999px;align-self:flex-start}
+.badge.open{background:#E2F3E8;color:var(--ok)}
+.badge.closed{background:#F7E3E5;color:var(--red-dk)}
+.badge i{width:8px;height:8px;border-radius:50%;background:currentColor}
+
+/* menu */
+.shopbar{background:var(--paper);border-bottom:1px solid var(--line)}
+.shopbar .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding-top:14px;padding-bottom:12px}
+.shopbar h2{font-family:var(--display);font-size:30px;margin:0;line-height:1;text-transform:uppercase}
+.shopbar .meta{color:var(--muted);font-size:14px}
+.mode{display:inline-flex;background:var(--wash);border-radius:999px;padding:3px;border:1px solid var(--line)}
+.mode button{padding:8px 16px;border-radius:999px;font-weight:700;font-size:14.5px}
+.mode button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.cats{position:sticky;top:calc(60px + env(safe-area-inset-top));z-index:10;background:var(--wash);border-bottom:1px solid var(--line)}
+.cats .wrap{display:flex;gap:6px;overflow-x:auto;padding-top:10px;padding-bottom:10px;scrollbar-width:none}
+.cats .wrap::-webkit-scrollbar{display:none}
+.cat{padding:7px 14px;border-radius:999px;background:var(--paper);border:1px solid var(--line);white-space:nowrap;font-weight:600;font-size:14.5px}
+.cat[aria-pressed="true"]{background:var(--red);border-color:var(--red);color:#fff}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;padding-top:12px;padding-bottom:120px}
+@media(min-width:960px){.layout{grid-template-columns:minmax(0,1fr) 360px;padding-bottom:40px}.cartbar{display:none!important}}
+.search{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--paper);margin-bottom:6px}
+/* the memorable element: gold brush banner like the printed menu */
+.banner{display:inline-block;position:relative;margin:26px 0 10px;padding:4px 26px 6px 14px;font-family:var(--script);font-size:27px;line-height:1.1;color:var(--ink)}
+.banner::before{content:"";position:absolute;inset:3px -4px 0 -6px;background:var(--gold);z-index:-1;transform:skewX(-8deg) rotate(-1deg);border-radius:3px 12px 4px 10px;
+  clip-path:polygon(0 12%,4% 0,96% 4%,100% 18%,98% 88%,93% 100%,3% 94%,0 80%)}
+.banner::after{content:"";position:absolute;left:-14px;top:50%;width:8px;height:22px;background:var(--ink);transform:translateY(-50%)}
+.items{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;isolation:isolate}
+.it{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:14px 16px}
+.it+.it{border-top:1px solid var(--line)}
+.it .nm{font-weight:600;font-size:16.5px;display:flex;gap:8px;align-items:flex-start}
+.it .pr{font-family:var(--display);font-weight:700;font-size:21px}
+.it .opt{color:var(--muted);font-size:13px}
+.it.off{opacity:.45}
+.vm{flex:none;width:14px;height:14px;border:1.6px solid currentColor;border-radius:3px;position:relative;margin-top:4px}
+.vm::after{content:"";position:absolute;inset:2.5px;border-radius:50%;background:currentColor}
+.vm.v{color:var(--veg)}.vm.n{color:var(--nv)}
+.add{border:2px solid var(--red);color:var(--red);font-weight:800;font-family:var(--display);font-size:18px;letter-spacing:.04em;padding:5px 18px;border-radius:10px;background:#fff;text-transform:uppercase}
+.add:hover{background:#FFF1F2}
+.step{display:inline-flex;align-items:center;border:2px solid var(--red);border-radius:10px;overflow:hidden;background:var(--red);color:#fff}
+.step button{width:36px;height:34px;font-size:20px;font-weight:700;color:#fff}
+.step span{min-width:24px;text-align:center;font-weight:800}
+.empty{color:var(--muted);text-align:center;padding:30px 10px}
+
+/* cart */
+.cart{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;position:sticky;top:132px;align-self:start}
+.cart h3,.sheet h3{font-family:var(--display);font-size:24px;margin:0 0 6px;text-transform:uppercase}
+.cl{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line)}
+.cl .n{font-weight:600;font-size:15px}.cl .n small{display:block;color:var(--muted);font-weight:500;font-size:12.5px}
+.cl .step{background:#fff;color:var(--red)}.cl .step button{color:var(--red);width:30px;height:30px}
+.sum{padding-top:10px;font-size:15px}.sum div{display:flex;justify-content:space-between;padding:2px 0}
+.sum .t{font-family:var(--display);font-size:28px;font-weight:800;border-top:2px solid var(--ink);margin-top:6px;padding-top:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 18px;border-radius:12px;font-weight:800;font-size:16.5px;background:var(--red);color:#fff;width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+.note{color:var(--muted);font-size:13.5px}
+.warn{background:#FFF4DB;color:#7A5300;border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600}
+.cartbar{position:fixed;left:0;right:0;bottom:0;z-index:15;padding:10px max(12px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));background:linear-gradient(transparent,rgba(245,242,241,.95) 30%)}
+.cartbar button{display:flex;align-items:center;gap:12px;width:100%;max-width:640px;margin:0 auto;background:var(--ink);color:#fff;border-radius:14px;padding:14px 18px;font-weight:700;box-shadow:0 8px 24px rgba(26,19,18,.28)}
+.cartbar .tt{margin-left:auto;font-family:var(--display);font-size:24px;font-weight:800}
+
+/* sheets */
+.ov{position:fixed;inset:0;background:rgba(26,19,18,.55);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--paper);width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:18px 18px 0 0;padding:18px max(16px,env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));animation:up .2s ease-out}
+@media(min-width:700px){.ov{align-items:center}.sheet{border-radius:18px}}
+@keyframes up{from{transform:translateY(28px)}to{transform:none}}
+@media(prefers-reduced-motion:reduce){.sheet{animation:none}}
+.sheet .hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}.sheet .hd h3{flex:1;margin:0}
+.x{width:36px;height:36px;border-radius:50%;background:var(--wash);font-size:20px;line-height:1}
+.grp{margin:12px 0}.grp .gl{font-weight:700;font-size:14px;margin-bottom:6px}.grp .gl span{color:var(--muted);font-weight:500}
+.ch{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;margin:0 6px 6px 0;font-weight:600;font-size:14.5px;background:#fff}
+.ch[aria-pressed="true"]{border-color:var(--red);background:#FFF1F2;color:var(--red-dk)}
+.fld{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.fld label{font-weight:700;font-size:14px}
+.inp{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.inp:focus{outline:2px solid var(--red);outline-offset:-1px}
+.err{color:var(--red-dk);font-size:13.5px;font-weight:600}
+
+/* status */
+.status{max-width:620px;margin:0 auto;padding:24px 0 60px}
+.st-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px}
+.st-big{font-family:var(--display);font-size:clamp(34px,7vw,48px);font-weight:800;line-height:1;text-transform:uppercase;margin:4px 0 6px}
+.steps{list-style:none;padding:0;margin:18px 0 6px}
+.steps li{display:flex;gap:12px;align-items:flex-start;padding:8px 0;color:var(--muted)}
+.steps li .dot{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);margin-top:1px}
+.steps li.done{color:var(--ink)}.steps li.done .dot{background:var(--ok);border-color:var(--ok)}
+.steps li.now{color:var(--ink);font-weight:700}.steps li.now .dot{border-color:var(--red);background:radial-gradient(var(--red) 40%,transparent 45%)}
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:12px;font-weight:600;z-index:60;max-width:90%;text-align:center}
+footer{color:var(--muted);font-size:13.5px;padding:24px 0 100px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <button class="logo" id="home" aria-label="Red Chilli home">Red Chilli<small>Fried Chicken</small></button>
+  <div class="sp"></div>
+  <button class="lnk" id="myorders" hidden>My orders</button>
+</div></header>
+<main id="main"></main>
+<div class="cartbar" id="cartbar" hidden></div>
+<div id="modal"></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const inr=n=>"₹"+Math.round(+n||0).toLocaleString("en-IN");
+const ls={get(k,d){try{const v=localStorage.getItem("rcw_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("rcw_"+k,JSON.stringify(v))}catch(e){}}};
+let CFG=null,BASE="";
+const S={stores:[],store:null,cart:ls.get("cart",[]),cat:"All",q:"",mode:ls.get("mode","pickup"),view:"stores",track:null,poll:null};
+
+/* ---- Firebase connection: on Firebase Hosting the project config is served at /__/firebase/init.json ---- */
+async function boot(){
+  if(window.RC_CONFIG&&window.RC_CONFIG.apiKey&&!/PASTE/.test(window.RC_CONFIG.apiKey))CFG=window.RC_CONFIG;
+  if(!CFG){try{const r=await fetch("/__/firebase/init.json");if(r.ok)CFG=await r.json()}catch(e){}}
+  if(!CFG){$("#main").innerHTML=`<div class="wrap"><p class="empty">Online ordering is being set up. Please call the shop to order.</p></div>`;return}
+  BASE=`https://firestore.googleapis.com/v1/projects/${CFG.projectId}/databases/(default)/documents`;
+  $("#myorders").hidden=!ls.get("orders",[]).length;
+  const hash=location.hash.slice(1);
+  await loadStores();
+  if(hash.startsWith("o-")){const [ ,code,id]=hash.split("-");return showStatus(code,id)}
+  const last=ls.get("store",null);const st=S.stores.find(s=>s.code===(hash||last));
+  if(st)openStore(st.code);else render();
+}
+async function api(method,path,body){
+  const url=BASE+path+(path.includes("?")?"&":"?")+"key="+encodeURIComponent(CFG.apiKey);
+  const r=await fetch(url,{method,headers:{"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
+  const t=await r.text();if(!r.ok)throw new Error(r.status+" "+t.slice(0,200));return t?JSON.parse(t):{};
+}
+async function loadStores(){
+  try{
+    const rows=await api("POST",":runQuery",{structuredQuery:{from:[{collectionId:"public"}]}});
+    S.stores=rows.filter(x=>x.document&&x.document.fields&&x.document.fields.j).map(x=>{try{return JSON.parse(x.document.fields.j.stringValue)}catch(e){return null}}).filter(Boolean)
+      .sort((a,b)=>a.name.localeCompare(b.name));
+  }catch(e){S.stores=[];toast("Could not load the menu. Check your internet and try again.")}
+}
+
+/* ---- opening hours ---- */
+const mins=t=>{const m=/^(\d{1,2}):(\d{2})/.exec(t||"");return m?(+m[1])*60+(+m[2]):null};
+function isOpen(st){const w=st.web||{};if(!w.on)return false;const o=mins(w.open),c=mins(w.close);if(o==null||c==null)return true;
+  const d=new Date(),n=d.getHours()*60+d.getMinutes();return c>o?(n>=o&&n<c):(n>=o||n<c)}
+const t12=t=>{const m=mins(t);if(m==null)return t;const h=Math.floor(m/60),mm=m%60;return (h%12||12)+(mm?":"+String(mm).padStart(2,"0"):"")+(h<12?" am":" pm")};
+function openLine(st){const w=st.web||{};if(!w.on)return "Not taking online orders now";return isOpen(st)?`Open · closes ${t12(w.close)}`:`Closed · opens ${t12(w.open)}`}
+
+/* ---- render ---- */
+function render(){
+  const m=$("#main");$("#cartbar").hidden=true;
+  if(S.view==="stores")return renderStores(m);
+  if(S.view==="menu")return renderMenu(m);
+}
+function renderStores(m){
+  m.innerHTML=`<section class="hero"><div class="stroke"></div><div class="stroke2"></div><div class="wrap">
+    <h1>Hot, crispy, ready soon.</h1><p>Choose your nearest Red Chilli. Order for pickup, or get it delivered to your door.</p></div></section>
+    <div class="wrap"><div class="stores">${S.stores.length?S.stores.map(st=>`<button class="store" data-s="${esc(st.code)}"><span class="badge ${isOpen(st)?"open":"closed"}"><i></i>${esc(openLine(st))}</span><b>${esc(st.name)}</b><span class="ad">${esc(st.addr||"")}</span>${st.phone?`<span class="ad num">${esc(st.phone)}</span>`:""}</button>`).join("")
+    :`<p class="empty">No stores are online yet. Please call the shop to order.</p>`}</div></div>
+    <footer class="wrap">Prices include GST. Pay by cash or UPI when you collect or receive your order.</footer>`;
+  m.querySelector(".stores").onclick=e=>{const b=e.target.closest("[data-s]");if(b)openStore(b.dataset.s)};
+}
+function openStore(code){
+  const st=S.stores.find(s=>s.code===code);if(!st)return;
+  if(S.store&&S.store.code!==code&&S.cart.length){S.cart=[];saveCart()}
+  S.store=st;ls.set("store",code);S.view="menu";S.cat="All";S.q="";
+  const w=st.web||{};if(S.mode==="delivery"&&!w.delivery)S.mode="pickup";if(S.mode==="pickup"&&!w.pickup&&w.delivery)S.mode="delivery";
+  history.replaceState(null,"","#"+code);render();scrollTo(0,0);
+}
+const groupsFor=it=>(S.store.addons||[]).filter(g=>g.cats&&g.cats.includes(it.cat)&&g.choices&&g.choices.length);
+function renderMenu(m){
+  const st=S.store,w=st.web||{},open=isOpen(st);
+  const cats=["All",...(st.cats||[]).filter(c=>st.items.some(i=>i.cat===c))];
+  m.innerHTML=`<section class="shopbar"><div class="wrap">
+      <div style="flex:1;min-width:220px"><h2>${esc(st.name)}</h2><div class="meta"><span class="badge ${open?"open":"closed"}" style="margin-right:8px"><i></i>${esc(openLine(st))}</span>${S.stores.length>1?`<button id="chg" style="text-decoration:underline;color:var(--red-dk);font-weight:600">Change store</button>`:""}</div></div>
+      <div class="mode" role="group" aria-label="Pickup or delivery">${w.pickup?`<button data-m="pickup" aria-pressed="${S.mode==="pickup"}">Pickup</button>`:""}${w.delivery?`<button data-m="delivery" aria-pressed="${S.mode==="delivery"}">Delivery${w.dchg?" · "+inr(w.dchg):""}</button>`:""}</div>
+    </div></section>
+    <nav class="cats" aria-label="Menu sections"><div class="wrap" id="cats">${cats.map(c=>`<button class="cat" data-c="${esc(c)}" aria-pressed="${S.cat===c}">${esc(c)}</button>`).join("")}</div></nav>
+    <div class="wrap layout"><div>
+      ${!open?`<p class="warn" style="margin-top:12px">${w.on?`This store opens at ${esc(t12(w.open))}. You can look at the menu now and order then.`:"This store is not taking online orders right now. Please call "+esc(st.phone||"the shop")+"."}</p>`:""}
+      ${S.mode==="delivery"&&w.area?`<p class="note" style="margin:10px 2px 0">Delivery ${esc(w.area)}${w.min?" · minimum order "+inr(w.min):""}</p>`:""}
+      <input class="search" id="q" type="search" placeholder="Search: wings, bucket, pizza…" value="${esc(S.q)}" aria-label="Search the menu" style="margin-top:12px">
+      <div id="list"></div>
+    </div>
+    <aside class="cart" id="cartside" aria-label="Your order"></aside></div>
+    <footer class="wrap">${esc(st.shop||"Red Chilli")} · ${esc(st.addr||"")}${st.phone?" · Call "+esc(st.phone):""}<br>Prices include GST. Pay by cash or UPI when you collect or receive your order.</footer>`;
+  renderList();renderCart();
+  if($("#chg"))$("#chg").onclick=()=>{S.view="stores";history.replaceState(null,"","#");render()};
+  m.querySelector(".mode").onclick=e=>{const b=e.target.closest("[data-m]");if(!b)return;S.mode=b.dataset.m;ls.set("mode",S.mode);render()};
+  $("#cats").onclick=e=>{const b=e.target.closest("[data-c]");if(!b)return;S.cat=b.dataset.c;S.q="";$("#q").value="";$("#cats").querySelectorAll(".cat").forEach(x=>x.setAttribute("aria-pressed",x===b));renderList()};
+  $("#q").oninput=e=>{S.q=e.target.value;renderList()};
+}
+function qtyOf(id){return S.cart.filter(l=>l.id===id).reduce((a,l)=>a+l.qty,0)}
+function renderList(){
+  const st=S.store,q=S.q.trim().toLowerCase();
+  let items=st.items.filter(i=>q?i.name.toLowerCase().includes(q):(S.cat==="All"||i.cat===S.cat));
+  const byCat={};items.forEach(i=>(byCat[i.cat]=byCat[i.cat]||[]).push(i));
+  const order=(st.cats||[]).filter(c=>byCat[c]);Object.keys(byCat).forEach(c=>{if(!order.includes(c))order.push(c)});
+  $("#list").innerHTML=items.length?order.map(c=>`<div class="banner">${esc(c)}</div><div class="items">${byCat[c].map(i=>{const q2=qtyOf(i.id),g=groupsFor(i).length;
+    return `<div class="it ${i.avail?"":"off"}"><div><div class="nm"><span class="vm ${i.veg?"v":"n"}" role="img" aria-label="${i.veg?"Veg":"Non-veg"}"></span><span>${esc(i.name)}</span></div>${g?`<div class="opt">Choices available</div>`:""}</div>
+    <div style="display:flex;align-items:center;gap:12px"><span class="pr num">${inr(i.price)}</span>${!i.avail?`<span class="note">Sold out</span>`:q2&&!g?`<span class="step"><button data-m="${i.id}" aria-label="Remove one">−</button><span class="num">${q2}</span><button data-p="${i.id}" aria-label="Add one">+</button></span>`:`<button class="add" data-a="${i.id}">${q2?"Add more":"Add"}</button>`}</div></div>`}).join("")}</div>`).join("")
+    :`<p class="empty">Nothing matches “${esc(S.q)}”. Try another word.</p>`;
+  $("#list").onclick=e=>{const b=e.target.closest("button");if(!b)return;const id=b.dataset.a||b.dataset.p||b.dataset.m;const it=S.store.items.find(i=>i.id===id);if(!it)return;
+    if(b.dataset.m){const l=S.cart.find(x=>x.id===id&&!x.opts.length);if(l){l.qty--;if(!l.qty)S.cart=S.cart.filter(x=>x!==l)}saveCart();renderList();renderCart();return}
+    if(groupsFor(it).length)return pickOptions(it);addToCart(it,1,[],0)};
+}
+function addToCart(it,qty,opts,ab){
+  const key=opts.join("|");const l=S.cart.find(x=>x.id===it.id&&x.opts.join("|")===key);
+  if(l)l.qty+=qty;else S.cart.push({id:it.id,name:it.name,opts,ab,price:+it.price+ab,qty});
+  saveCart();renderList();renderCart();
+}
+function saveCart(){ls.set("cart",S.cart)}
+function totals(){const w=S.store.web||{};const sub=S.cart.reduce((a,l)=>a+l.price*l.qty,0);const d=S.mode==="delivery"?(+w.dchg||0):0;return {sub,d,total:sub+d,qty:S.cart.reduce((a,l)=>a+l.qty,0)}}
+function cartHTML(inSheet){
+  const t=totals(),w=S.store.web||{};
+  if(!S.cart.length)return `<h3>Your order</h3><p class="note">Your order is empty. Tap Add on any item.</p>`;
+  const short=S.mode==="delivery"&&w.min&&t.sub<w.min;
+  return `<div class="hd" style="display:flex;align-items:center"><h3 style="flex:1">Your order</h3>${inSheet?`<button class="x" data-x aria-label="Close">×</button>`:""}</div>
+   ${S.cart.map((l,i)=>`<div class="cl"><div class="n">${esc(l.name)}${l.opts.length?`<small>${esc(l.opts.join(", "))}</small>`:""}</div><span class="step"><button data-cm="${i}" aria-label="Remove one">−</button><span class="num">${l.qty}</span><button data-cp="${i}" aria-label="Add one">+</button></span><b class="num">${inr(l.price*l.qty)}</b></div>`).join("")}
+   <div class="sum num"><div><span>Items (${t.qty})</span><span>${inr(t.sub)}</span></div>${t.d?`<div><span>Delivery</span><span>${inr(t.d)}</span></div>`:""}<div class="t"><span>Total</span><span>${inr(t.total)}</span></div></div>
+   ${short?`<p class="warn">Add ${inr(w.min-t.sub)} more for delivery (minimum ${inr(w.min)}).</p>`:""}
+   <button class="btn" data-co ${short||!isOpen(S.store)?"disabled":""}>${isOpen(S.store)?(S.mode==="delivery"?"Continue to delivery details":"Continue to pickup details"):"Store is closed now"}</button>`;
+}
+function bindCart(root){
+  root.onclick=e=>{const b=e.target.closest("button");if(!b)return;
+    if(b.dataset.cp!=null){S.cart[+b.dataset.cp].qty++;saveCart();refresh();return}
+    if(b.dataset.cm!=null){const l=S.cart[+b.dataset.cm];l.qty--;if(!l.qty)S.cart.splice(+b.dataset.cm,1);saveCart();refresh();return}
+    if(b.hasAttribute("data-co"))return checkout();
+    if(b.hasAttribute("data-x"))return closeSheet()};
+}
+function refresh(){renderList();renderCart();if($("#cartsheet")){if(!S.cart.length)return closeSheet();$("#cartsheet").innerHTML=cartHTML(true)}}
+function renderCart(){
+  const side=$("#cartside");if(side){side.innerHTML=cartHTML(false);bindCart(side)}
+  const t=totals(),bar=$("#cartbar");bar.hidden=!S.cart.length;
+  bar.innerHTML=`<button id="vc"><span>${t.qty} item${t.qty>1?"s":""} · View order</span><span class="tt num">${inr(t.total)}</span></button>`;
+  if(S.cart.length)$("#vc").onclick=()=>{sheet(`<div id="cartsheet">${cartHTML(true)}</div>`);bindCart($("#cartsheet"))};
+}
+
+/* ---- sheets ---- */
+function sheet(html){$("#modal").innerHTML=`<div class="ov" id="ov"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`;$("#ov").onclick=e=>{if(e.target.id==="ov")closeSheet()};document.body.style.overflow="hidden"}
+function closeSheet(){$("#modal").innerHTML="";document.body.style.overflow=""}
+addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#ov"))closeSheet()});
+let tt;function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2600)}
+
+function pickOptions(it){
+  const gs=groupsFor(it);const sel=gs.map(g=>g.multi?[]:(g.req?[0]:[]));let qty=1;
+  const price=()=>{let p=+it.price;gs.forEach((g,gi)=>sel[gi].forEach(ci=>p+=+g.choices[ci].p||0));return p};
+  const draw=()=>{sheet(`<div class="hd"><h3>${esc(it.name)}</h3><button class="x" data-x aria-label="Close">×</button></div>
+    ${gs.map((g,gi)=>`<div class="grp"><div class="gl">${esc(g.name)} <span>${g.multi?"· choose any":g.req?"· choose one":"· optional"}</span></div>${g.choices.map((c,ci)=>`<button class="ch" data-g="${gi}" data-c="${ci}" aria-pressed="${sel[gi].includes(ci)}">${esc(c.n)}${+c.p?" +"+inr(c.p):""}</button>`).join("")}</div>`).join("")}
+    <div style="display:flex;align-items:center;gap:12px;margin:16px 0"><span style="flex:1;font-weight:700">Quantity</span><span class="step"><button id="qm" aria-label="Less">−</button><span class="num">${qty}</span><button id="qp" aria-label="More">+</button></span></div>
+    <button class="btn" id="oadd">Add ${qty>1?qty+" for ":""}${inr(price()*qty)}</button>`);
+    $("#modal").querySelector(".sheet").onclick=e=>{const b=e.target.closest("button");if(!b)return;
+      if(b.hasAttribute("data-x"))return closeSheet();
+      if(b.dataset.g!=null){const gi=+b.dataset.g,ci=+b.dataset.c,g=gs[gi];if(g.multi){const i=sel[gi].indexOf(ci);i>=0?sel[gi].splice(i,1):sel[gi].push(ci)}else sel[gi]=(sel[gi][0]===ci&&!g.req)?[]:[ci];draw()}
+      if(b.id==="qm"){qty=Math.max(1,qty-1);draw()}if(b.id==="qp"){qty++;draw()}
+      if(b.id==="oadd"){const opts=[];let ab=0;gs.forEach((g,gi)=>sel[gi].forEach(ci=>{opts.push(g.choices[ci].n);ab+=+g.choices[ci].p||0}));closeSheet();addToCart(it,qty,opts,ab);toast("Added "+it.name)}}};
+  draw();
+}
+function checkout(){
+  const me=ls.get("me",{name:"",phone:"",addr:""});const w=S.store.web||{};const t=totals();
+  sheet(`<div class="hd"><h3>${S.mode==="delivery"?"Delivery details":"Pickup details"}</h3><button class="x" data-x aria-label="Close">×</button></div>
+  <form id="cof" novalidate>
+   <div class="fld"><label for="fn">Your name</label><input class="inp" id="fn" autocomplete="name" value="${esc(me.name)}" required></div>
+   <div class="fld"><label for="fp">Mobile number</label><input class="inp num" id="fp" type="tel" inputmode="numeric" autocomplete="tel" maxlength="10" value="${esc(me.phone)}" placeholder="10 digits" required></div>
+   ${S.mode==="delivery"?`<div class="fld"><label for="fa">Delivery address</label><textarea class="inp" id="fa" rows="3" autocomplete="street-address" placeholder="House no., street, landmark">${esc(me.addr)}</textarea><span class="note">${esc(w.area?"We deliver "+w.area+".":"")}</span></div>`:""}
+   <div class="fld"><label for="fnote">Note for the kitchen (optional)</label><input class="inp" id="fnote" placeholder="e.g. extra spicy, no mayo"></div>
+   <div class="fld"><label>Payment</label><div><button type="button" class="ch" data-pay="cash" aria-pressed="true">Cash</button><button type="button" class="ch" data-pay="upi" aria-pressed="false">UPI</button></div><span class="note">Pay when you ${S.mode==="delivery"?"receive":"collect"} your order.</span></div>
+   <div class="sum num"><div class="t"><span>Total</span><span>${inr(t.total)}</span></div></div>
+   <p class="err" id="ferr"></p>
+   <button class="btn" type="submit" id="place">Place order</button>
+  </form>`);
+  let pay="cash";
+  $("#modal").querySelector(".x").onclick=closeSheet;
+  $("#modal").querySelectorAll("[data-pay]").forEach(b=>b.onclick=()=>{pay=b.dataset.pay;$("#modal").querySelectorAll("[data-pay]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+  $("#cof").onsubmit=async e=>{e.preventDefault();
+    const name=$("#fn").value.trim(),phone=$("#fp").value.replace(/\D/g,""),addr=$("#fa")?$("#fa").value.trim():"",note=$("#fnote").value.trim();
+    if(name.length<2)return $("#ferr").textContent="Enter your name.";
+    if(!/^[6-9]\d{9}$/.test(phone))return $("#ferr").textContent="Enter a 10-digit mobile number.";
+    if(S.mode==="delivery"&&addr.length<8)return $("#ferr").textContent="Enter your full delivery address.";
+    if(!isOpen(S.store))return $("#ferr").textContent="The store has just closed. Please call the shop.";
+    ls.set("me",{name,phone,addr:addr||me.addr});
+    $("#place").disabled=true;$("#place").textContent="Placing order…";
+    const id=Array.from(crypto.getRandomValues(new Uint8Array(14)),b=>"abcdefghijkmnpqrstuvwxyz23456789"[b%32]).join("");
+    const ord={id,store:S.store.code,name,phone,mode:S.mode,addr,note,pay,lines:S.cart.map(l=>({id:l.id,name:l.name,opts:l.opts,ab:l.ab,price:l.price,qty:l.qty})),sub:t.sub,dchg:t.d,total:t.total,t:Date.now(),status:"new"};
+    try{
+      await api("POST",`/online/${S.store.code}/orders?documentId=${id}`,{fields:{j:{stringValue:JSON.stringify(ord)},st:{stringValue:"new"},u:{integerValue:String(Date.now())},t:{integerValue:String(Date.now())}}});
+      const mine=ls.get("orders",[]);mine.unshift({id,code:S.store.code,t:Date.now(),total:t.total,store:S.store.name});ls.set("orders",mine.slice(0,20));
+      S.cart=[];saveCart();closeSheet();$("#myorders").hidden=false;showStatus(S.store.code,id);
+    }catch(err){$("#place").disabled=false;$("#place").textContent="Place order";$("#ferr").textContent="The order did not go through. Check your internet and try again, or call "+(S.store.phone||"the shop")+"."}
+  };
+}
+
+/* ---- order status ---- */
+const FLOW={pickup:[["new","Sent to the shop"],["accepted","Accepted, being prepared"],["ready","Ready for pickup"],["done","Picked up"]],
+  delivery:[["new","Sent to the shop"],["accepted","Accepted, being prepared"],["ready","Out for delivery"],["done","Delivered"]]};
+async function showStatus(code,id){
+  S.view="status";S.track={code,id};history.replaceState(null,"","#o-"+code+"-"+id);$("#cartbar").hidden=true;clearInterval(S.poll);
+  const m=$("#main");m.innerHTML=`<div class="wrap status"><div class="st-card"><p class="note">Loading your order…</p></div></div>`;
+  const load=async()=>{
+    try{const d=await api("GET",`/online/${code}/orders/${id}`);const o=JSON.parse(d.fields.j.stringValue);const st=S.stores.find(s=>s.code===code)||{name:code,phone:""};
+      const flow=FLOW[o.mode]||FLOW.pickup;const idx=flow.findIndex(f=>f[0]===o.status);
+      const head=o.status==="rejected"?"Order not accepted":o.status==="done"?"Enjoy your meal":idx<=0?"Waiting for the shop":flow[idx][1];
+      m.innerHTML=`<div class="wrap status"><div class="st-card">
+        <p class="note">Order ${esc(id.slice(-5).toUpperCase())} · ${esc(st.name)} · ${new Date(o.t).toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"})}</p>
+        <div class="st-big">${esc(head)}</div>
+        ${o.token?`<p style="margin:0">Your token number is <b class="num" style="font-size:22px">${esc(o.token)}</b>.</p>`:""}
+        ${o.status==="rejected"?`<p class="warn">${esc(o.msg||"The shop could not take this order.")} Please call ${esc(st.phone||"the shop")}.</p>`
+          :`<ol class="steps">${flow.map((f,i)=>`<li class="${i<idx||o.status==="done"?"done":i===idx?"now":""}"><span class="dot"></span><span>${esc(f[1])}</span></li>`).join("")}</ol>`}
+        ${o.msg&&o.status!=="rejected"?`<p class="note">Message from the shop: ${esc(o.msg)}</p>`:""}
+        <div class="sum num" style="margin-top:8px">${o.lines.map(l=>`<div><span>${l.qty} × ${esc(l.name)}${l.opts&&l.opts.length?" ("+esc(l.opts.join(", "))+")":""}</span><span>${inr(l.price*l.qty)}</span></div>`).join("")}
+          ${o.dchg?`<div><span>Delivery</span><span>${inr(o.dchg)}</span></div>`:""}<div class="t"><span>Total</span><span>${inr(o.total)}</span></div></div>
+        <p class="note">Pay ${o.pay==="upi"?"by UPI":"in cash"} when you ${o.mode==="delivery"?"receive":"collect"} your order.${st.phone?" Questions? Call "+esc(st.phone)+".":""}</p>
+        <button class="btn ghost" id="again" style="margin-top:8px">Order more food</button></div></div>`;
+      $("#again").onclick=()=>{clearInterval(S.poll);openStore(code)};
+      if(["done","rejected"].includes(o.status))clearInterval(S.poll);
+    }catch(e){m.innerHTML=`<div class="wrap status"><div class="st-card"><p>We couldn't load this order. Check your internet and refresh the page.</p><button class="btn ghost" id="again">Back to menu</button></div></div>`;$("#again").onclick=()=>{S.view="stores";render()}}
+  };
+  await load();S.poll=setInterval(()=>{if(!document.hidden)load()},12000);
+}
+function myOrders(){
+  const mine=ls.get("orders",[]);
+  sheet(`<div class="hd"><h3>My orders</h3><button class="x" data-x aria-label="Close">×</button></div>
+   ${mine.length?mine.map(o=>`<button class="cl" style="width:100%;text-align:left;grid-template-columns:1fr auto" data-o="${o.code}-${o.id}"><span class="n">${esc(o.store)}<small>${new Date(o.t).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"})} · order ${esc(o.id.slice(-5).toUpperCase())}</small></span><b class="num">${inr(o.total)}</b></button>`).join(""):`<p class="note">No orders yet.</p>`}`);
+  $("#modal").querySelector(".sheet").onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.hasAttribute("data-x"))return closeSheet();if(b.dataset.o){const [c,...r]=b.dataset.o.split("-");closeSheet();showStatus(c,r.join("-"))}};
+}
+$("#myorders").onclick=myOrders;
+$("#home").onclick=()=>{clearInterval(S.poll);S.view="stores";history.replaceState(null,"","#");render()};
+if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+boot();
+</script>
+</body>
+</html>
