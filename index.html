@@ -81,6 +81,13 @@ button{cursor:pointer;border:0;background:none}
 .banner::after{content:"";position:absolute;left:-14px;top:50%;width:8px;height:22px;background:var(--ink);transform:translateY(-50%)}
 .items{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;isolation:isolate}
 .it{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:14px 16px}
+.it.ph{grid-template-columns:minmax(0,1fr) 116px;align-items:start}
+.pic{position:relative;width:116px;display:flex;flex-direction:column;align-items:center}
+.pic img{width:116px;height:96px;object-fit:cover;border-radius:12px;background:var(--gold-lt);display:block}
+.pic .add,.pic .step{margin-top:-18px;position:relative;box-shadow:0 3px 10px rgba(26,19,18,.18)}
+.pic .soldout{margin-top:6px}
+.pic .add{padding:5px 12px;white-space:nowrap;font-size:16px}
+@media(min-width:700px){.it.ph{grid-template-columns:minmax(0,1fr) 140px}.pic,.pic img{width:140px}.pic img{height:110px}}
 .it+.it{border-top:1px solid var(--line)}
 .it .nm{font-weight:600;font-size:16.5px;display:flex;gap:8px;align-items:flex-start}
 .it .pr{font-family:var(--display);font-weight:700;font-size:21px}
@@ -233,7 +240,7 @@ function renderMenu(m){
       <div id="list"></div>
     </div>
     <aside class="cart" id="cartside" aria-label="Your order"></aside></div>
-    <footer class="wrap">${esc(st.shop||"Red Chilli")} · ${esc(st.addr||"")}${st.phone?" · Call "+esc(st.phone):""}<br>Prices include GST. Pay by cash or UPI when you collect or receive your order.</footer>`;
+    <footer class="wrap">${esc(st.shop||"Red Chilli")} · ${esc(st.addr||"")}${st.phone?" · Call "+esc(st.phone):""}<br>Prices include GST. Pay by cash or UPI when you collect or receive your order.<br>Food photos are for illustration only; actual servings may look different. Photos: <a href="https://unsplash.com" target="_blank" rel="noopener" style="color:inherit">Unsplash</a>.</footer>`;
   renderList();renderCart();
   if($("#chg"))$("#chg").onclick=()=>{S.view="stores";history.replaceState(null,"","#");render()};
   m.querySelector(".mode").onclick=e=>{const b=e.target.closest("[data-m]");if(!b)return;S.mode=b.dataset.m;ls.set("mode",S.mode);render()};
@@ -241,14 +248,60 @@ function renderMenu(m){
   $("#q").oninput=e=>{S.q=e.target.value;renderList()};
 }
 function qtyOf(id){return S.cart.filter(l=>l.id===id).reduce((a,l)=>a+l.qty,0)}
+/* Representative food photos from Unsplash (free for commercial use under the Unsplash License).
+   An item's own photo (set in the POS: Menu > item > Photo link) always wins. */
+const U=id=>"https://images.unsplash.com/photo-"+id+"?auto=format&fit=crop&w=320&h=264&q=60";
+const PHOTO_RULES=[
+  [/mojito|curacao|passion|peach|orange fizz|hawai|lychee|crush|blueberry/i,"1632995561645-86a7777d3e7a"],
+  [/fruit milkshake|fig|muskmelon/i,"1686638745403-d21193f16b2f"],
+  [/milkshake/i,"1579954115545-a95591f28bfc"],
+  [/sharjah/i,"1553787499-6f9133860278"],
+  [/cold coffee|ice milo/i,"1461023058943-07fcbe16d735"],
+  [/ice tea|lemon tea|soda/i,"1546171753-97d7676e4602"],
+  [/juice|lemon mint/i,"1555766720-1e727844cc8f"],
+  [/hot chocolate|milo|boost|horlicks/i,"1517578239113-b03992dcdd25"],
+  [/coffee/i,"1497636577773-f1231844b336"],
+  [/\btea\b/i,"1555894956-7ea912c3c887"],
+  [/gulab|brownie|fresh fruits with ice/i,"1580915411954-282cb1b0d780"],
+  [/ice cream/i,"1570197788417-0e82375c9371"],
+  [/soup/i,"1547592166-23ac45744acd"],
+  [/pasta/i,"1676300184847-4ee4030409c0"],
+  [/noodle/i,"1585032226651-759b368d7246"],
+  [/fried rice|\brice\b/i,"1603133872878-684f208fb84b"],
+  [/pizza/i,"1565299624946-b28f40a0ae38"],
+  [/shawarma/i,"1529006557810-274b9b2fc783"],
+  [/wrap/i,"1778168199427-4e839943d20f"],
+  [/sandwich/i,"1633321702518-7feccafb94d5"],
+  [/burger/i,"1568901346375-23c9450c58cd"],
+  [/combo/i,"1624153064067-566cae78993d"],
+  [/loaded/i,"1766589221606-08bc21fa1acd"],
+  [/fries/i,"1627662056598-dcfc5000f769"],
+  [/wings/i,"1567620832903-9fc6debc209f"],
+  [/popcorn/i,"1696265498747-efc4c0dd7b98"],
+  [/nugget/i,"1627662055487-551888db3aa8"],
+  [/strips/i,"1619881589279-20f389897508"],
+  [/chicken 65/i,"1585703900468-13c7a978ad86"],
+  [/fried chicken|peri peri/i,"1608039755401-742074f0548d"]
+];
+function photoFor(i){
+  if(i.img&&/^https:\/\//.test(i.img))return i.img;
+  if(i.img==="none")return "";
+  const hay=i.name+" "+i.cat;
+  for(const [re,id] of PHOTO_RULES)if(re.test(hay))return U(id);
+  return "";
+}
 function renderList(){
   const st=S.store,q=S.q.trim().toLowerCase();
   let items=st.items.filter(i=>q?i.name.toLowerCase().includes(q):(S.cat==="All"||i.cat===S.cat));
   const byCat={};items.forEach(i=>(byCat[i.cat]=byCat[i.cat]||[]).push(i));
   const order=(st.cats||[]).filter(c=>byCat[c]);Object.keys(byCat).forEach(c=>{if(!order.includes(c))order.push(c)});
   $("#list").innerHTML=items.length?order.map(c=>`<div class="banner">${esc(c)}</div><div class="items">${byCat[c].map(i=>{const q2=qtyOf(i.id),g=groupsFor(i).length;
-    return `<div class="it ${i.avail?"":"off"}"><div><div class="nm"><span class="vm ${i.veg?"v":"n"}" role="img" aria-label="${i.veg?"Veg":"Non-veg"}"></span><span>${esc(i.name)}</span></div>${g?`<div class="opt">Choices available</div>`:""}</div>
-    <div style="display:flex;align-items:center;gap:12px"><span class="pr num">${inr(i.price)}</span>${!i.avail?`<span class="note">Sold out</span>`:q2&&!g?`<span class="step"><button data-m="${i.id}" aria-label="Remove one">−</button><span class="num">${q2}</span><button data-p="${i.id}" aria-label="Add one">+</button></span>`:`<button class="add" data-a="${i.id}">${q2?"Add more":"Add"}</button>`}</div></div>`}).join("")}</div>`).join("")
+    const ctl=!i.avail?`<span class="note soldout">Sold out</span>`:q2&&!g?`<span class="step"><button data-m="${i.id}" aria-label="Remove one">−</button><span class="num">${q2}</span><button data-p="${i.id}" aria-label="Add one">+</button></span>`:`<button class="add" data-a="${i.id}">${q2?"Add more":"Add"}</button>`;
+    const ph=photoFor(i);
+    return ph?`<div class="it ph ${i.avail?"":"off"}"><div><div class="nm"><span class="vm ${i.veg?"v":"n"}" role="img" aria-label="${i.veg?"Veg":"Non-veg"}"></span><span>${esc(i.name)}</span></div><div class="pr num" style="margin-top:4px">${inr(i.price)}</div>${g?`<div class="opt">Choices available</div>`:""}</div>
+      <div class="pic"><img src="${esc(ph)}" alt="" loading="lazy" decoding="async" width="140" height="110" onerror="this.removeAttribute('src')">${ctl}</div></div>`
+    :`<div class="it ${i.avail?"":"off"}"><div><div class="nm"><span class="vm ${i.veg?"v":"n"}" role="img" aria-label="${i.veg?"Veg":"Non-veg"}"></span><span>${esc(i.name)}</span></div>${g?`<div class="opt">Choices available</div>`:""}</div>
+    <div style="display:flex;align-items:center;gap:12px"><span class="pr num">${inr(i.price)}</span>${ctl}</div></div>`}).join("")}</div>`).join("")
     :`<p class="empty">Nothing matches “${esc(S.q)}”. Try another word.</p>`;
   $("#list").onclick=e=>{const b=e.target.closest("button");if(!b)return;const id=b.dataset.a||b.dataset.p||b.dataset.m;const it=S.store.items.find(i=>i.id===id);if(!it)return;
     if(b.dataset.m){const l=S.cart.find(x=>x.id===id&&!x.opts.length);if(l){l.qty--;if(!l.qty)S.cart=S.cart.filter(x=>x!==l)}saveCart();renderList();renderCart();return}
