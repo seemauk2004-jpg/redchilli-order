@@ -209,7 +209,10 @@ function render(){
   if(S.view==="stores")return renderStores(m);
   if(S.view==="menu")return renderMenu(m);
 }
+function setHeaderLogo(src){const h=$("#home");if(!h)return;
+  h.innerHTML=src?`<img src="${esc(src)}" alt="Red Chilli" style="height:42px;max-width:55vw;object-fit:contain;display:block">`:`Red Chilli<small>Fried Chicken</small>`}
 function renderStores(m){
+  setHeaderLogo((S.stores.find(s=>s.logo)||{}).logo);
   m.innerHTML=`<section class="hero"><div class="stroke"></div><div class="stroke2"></div><div class="wrap">
     <h1>Hot, crispy, ready soon.</h1><p>Choose your nearest Red Chilli. Order for pickup, or get it delivered to your door.</p></div></section>
     <div class="wrap"><div class="stores">${S.stores.length?S.stores.map(st=>`<button class="store" data-s="${esc(st.code)}"><span class="badge ${isOpen(st)?"open":"closed"}"><i></i>${esc(openLine(st))}</span><b>${esc(st.name)}</b><span class="ad">${esc(st.addr||"")}</span>${st.phone?`<span class="ad num">${esc(st.phone)}</span>`:""}</button>`).join("")
@@ -223,10 +226,12 @@ function openStore(code){
   S.store=st;ls.set("store",code);S.view="menu";S.cat="All";S.q="";
   const w=st.web||{};if(S.mode==="delivery"&&!w.delivery)S.mode="pickup";if(S.mode==="pickup"&&!w.pickup&&w.delivery)S.mode="delivery";
   history.replaceState(null,"","#"+code);render();scrollTo(0,0);
+  loadStorePhotos(st);
 }
 const groupsFor=it=>(S.store.addons||[]).filter(g=>g.cats&&g.cats.includes(it.cat)&&g.choices&&g.choices.length);
 function renderMenu(m){
   const st=S.store,w=st.web||{},open=isOpen(st);
+  setHeaderLogo(st.logo||(S.stores.find(s=>s.logo)||{}).logo);
   const cats=["All",...(st.cats||[]).filter(c=>st.items.some(i=>i.cat===c))];
   m.innerHTML=`<section class="shopbar"><div class="wrap">
       <div style="flex:1;min-width:220px"><h2>${esc(st.name)}</h2><div class="meta"><span class="badge ${open?"open":"closed"}" style="margin-right:8px"><i></i>${esc(openLine(st))}</span>${S.stores.length>1?`<button id="chg" style="text-decoration:underline;color:var(--red-dk);font-weight:600">Change store</button>`:""}</div></div>
@@ -283,7 +288,18 @@ const PHOTO_RULES=[
   [/chicken 65/i,"1585703900468-13c7a978ad86"],
   [/fried chicken|peri peri/i,"1608039755401-742074f0548d"]
 ];
+let WEBPH={};
+async function loadStorePhotos(st){
+  const want=st.items.filter(i=>i.ph&&i.phs&&!WEBPH[i.id+":"+i.ph]);if(!want.length)return;
+  const base=`projects/${CFG.projectId}/databases/(default)/documents/photos/`;
+  for(let k=0;k<want.length;k+=60){
+    try{const r=await api("POST",":batchGet",{documents:want.slice(k,k+60).map(i=>base+i.phs+"_"+i.id)});
+      r.forEach(d=>{if(!d.found)return;const f=d.found.fields;const it=st.items.find(i=>i.id===f.i.stringValue);if(it)WEBPH[it.id+":"+it.ph]=f.j.stringValue});
+      if(S.view==="menu"&&S.store===st)renderList()}catch(e){}
+  }
+}
 function photoFor(i){
+  if(i.ph&&WEBPH[i.id+":"+i.ph])return WEBPH[i.id+":"+i.ph];
   if(i.img&&/^https:\/\//.test(i.img))return i.img;
   if(i.img==="none")return "";
   const hay=i.name+" "+i.cat;
