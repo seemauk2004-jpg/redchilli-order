@@ -245,7 +245,7 @@ function renderMenu(m){
       <div id="list"></div>
     </div>
     <aside class="cart" id="cartside" aria-label="Your order"></aside></div>
-    <footer class="wrap">${esc(st.shop||"Red Chilli")} · ${esc(st.addr||"")}${st.phone?" · Call "+esc(st.phone):""}<br>Prices include GST. Pay by cash or UPI when you collect or receive your order.<br>Food photos are for illustration only; actual servings may look different. Photos: <a href="https://unsplash.com" target="_blank" rel="noopener" style="color:inherit">Unsplash</a>.</footer>`;
+    <footer class="wrap">${esc(st.shop||"Red Chilli")} · ${esc(st.addr||"")}${st.phone?` · Call <a href="tel:${esc(st.phone)}" style="color:inherit">${esc(st.phone)}</a>`:""} · <a href="privacy.html" style="color:inherit">Privacy policy</a><br>Prices include GST. Pay by cash or UPI when you collect or receive your order.<br>Food photos are for illustration only; actual servings may look different. Photos: <a href="https://unsplash.com" target="_blank" rel="noopener" style="color:inherit">Unsplash</a>.</footer>`;
   renderList();renderCart();
   if($("#chg"))$("#chg").onclick=()=>{S.view="stores";history.replaceState(null,"","#");render()};
   m.querySelector(".mode").onclick=e=>{const b=e.target.closest("[data-m]");if(!b)return;S.mode=b.dataset.m;ls.set("mode",S.mode);render()};
@@ -443,6 +443,12 @@ function myOrders(){
   $("#modal").querySelector(".sheet").onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.hasAttribute("data-x"))return closeSheet();if(b.dataset.o){const [c,...r]=b.dataset.o.split("-");closeSheet();showStatus(c,r.join("-"))}};
 }
 $("#myorders").onclick=myOrders;
+/* Android app back button: close a sheet, then step back store menu > store list */
+window.appBack=function(){
+  if($("#ov")){closeSheet();return true}
+  if(S.view==="status"){clearInterval(S.poll);if(S.store){S.view="menu";history.replaceState(null,"","#"+S.store.code);render()}else{S.view="stores";history.replaceState(null,"","#");render()}return true}
+  if(S.view==="menu"&&S.stores.length>1){S.view="stores";history.replaceState(null,"","#");render();return true}
+  return false};
 $("#home").onclick=()=>{clearInterval(S.poll);S.view="stores";history.replaceState(null,"","#");render()};
 if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 boot();
